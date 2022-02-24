@@ -1,0 +1,26 @@
+Tic Tac Toe - ToDos
+
+Voraussetzung Assets:
+-Hintergrund
+-Kreis
+-Kreuz
+-Leeres Feld
+
+1. HTML-Grundgerüst
+2. Phaser installieren
+3. "Hello Phaser" 
+4. Grafik/Text anzeigen
+5. Objekte anklicken
+6. Szene 1 Menü
+7. Szene 2 Spieloberfläche
+8. Hintergrund zeigen
+9. Klick --> Spielobjekt erstellen
+10. Spiellogik --> Tic Tac Toe - Regeln
+
+Spiellogik:
+- Spieler 1 (X) ist zuerst dran
+- Klick und X setzten
+- Spieler 2 (O) ist dran
+- Klick und O setzten
+- Feld darf nicht mehr erneut angeklickt werden
+- Gewinner prüfen

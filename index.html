@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.15.1/dist/phaser-arcade-physics.min.js"></script>
+</head>
+
+<body>
+
+    <script>
+        var config = {
+            type: Phaser.AUTO,
+            width: 1200,
+            height: 800,
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 200 }
+                }
+            },
+            scene: {
+                preload: preload,
+                create: create
+            }
+        };
+
+        var game = new Phaser.Game(config);
+        var scene = null;
+
+        var SPIELER1 = "kreuz";
+        var SPIELER2 = "kreis";
+
+        var amSpielzug = SPIELER1;
+        var spielzug = 9;
+        var spielFeld = [[null, null , null],[null, null , null],[null, null , null]];
+        var isWining = false;
+
+        function preload() {
+            
+            this.load.image('hintergrund', 'assets/hintergrund.png');
+            this.load.image('leer', 'assets/leer.png');
+            this.load.image('kreis', 'assets/kreis.png');
+            this.load.image('kreuz', 'assets/kreuz.png');
+
+        }
+
+        function create() {
+            // this global nutzbar machen!
+            if(scene === null){
+                scene = this;
+            }
+            // Button 
+            const button = this.add.text(840, 250, 'New Game', { font: '64px Courier', fill: '#00ff00' })
+                .setInteractive()
+                .on('pointerdown', () => {
+                    scene.registry.destroy(); // destroy registry
+                    scene.events.off();  //disable all active events
+                    scene.scene.restart(); // restart current scene
+                    spielzug = 9;
+                    spielFeld = [[null, null , null],[null, null , null],[null, null , null]];
+                    amSpielzug = SPIELER1;
+            });
+        
+        
+            // Spielfeld image 
+            hintergrund = scene.add.image(400, 300, 'hintergrund');
+            hintergrund.setScale(1);
+            // Spiele Anzeige erstellen
+            
+            text = scene.add.text(10, 600, '', { font: '64px Courier', fill: '#00ff00' });
+            text.setText([
+            'Player: ' + 'kreuz',
+            'Rounds left: ' + spielzug,
+            
+        ]);
+            
+            /* Erste Reihe */
+            kachelErstellen(186,118, 1);
+            kachelErstellen(386,118, 2);
+            kachelErstellen(620,118, 3);
+            /* Zweite Reihe */
+            kachelErstellen(186,278, 4);
+            kachelErstellen(386,278, 5);
+            kachelErstellen(620,278), 6;
+            /* Dritte Reihe */
+            kachelErstellen(186,450, 7);
+            kachelErstellen(386,450, 8);
+            kachelErstellen(620,450, 9);
+        }
+
+
+        function update() {
+
+        }
+
+        function kachelErstellen(x, y){
+            // Leeres Feld erstellen
+            var kachel = scene.add.image(x,y, "leer").setInteractive();
+            kachel.setScale(0.85);
+            // Funktion in Feld klicken
+            kachel.on('pointerup', function() {
+                // Abbrechbedingung für klick ins Feld
+                if(kachel.besetzt || isWining === true){
+                    return;
+                }
+                // X oder O setzen
+                var besetzt = scene.add.image(x,y, amSpielzug);
+                besetzt.setScale(0.63);
+                // Rundenzahl aktualisieren
+                spielzug --;
+                // Feld wurde befüllt
+                kachel.besetzt = true;
+                 //spielFeld setzen
+                checkKachelPosition(x,y);
+                //Spieler wechsel
+                naechsterSpielzug();
+                // Update Text
+               if(isWining === false){
+                text.setText([
+            'Player: ' + amSpielzug,
+            'Rounds left: ' + spielzug,
+            
+        ]);
+    }
+            });   
+        }
+
+       function gewinnerPruefen(){
+
+        
+           // Check Row
+          
+            for(let i = 0; i < spielFeld.length; i++){
+                if(spielFeld[i][0] === "kreis" && spielFeld[i][1] === "kreis" && spielFeld[i][2] === "kreis"){
+                    text.setText("Kreis hat gewonnen!")
+                    isWining = true;
+                }
+                if(spielFeld[i][0] === "kreuz" && spielFeld[i][1] === "kreuz" && spielFeld[i][2] === "kreuz"){
+                    text.setText("Kreuz hat gewonnen!")
+                    isWining = true;
+                }
+        }
+
+
+         // Check Column
+        if(isWining === false){
+            for(let i = 0; i < spielFeld.length; i++){
+                if(spielFeld[0][i] === "kreis" && spielFeld[1][i] === "kreis" && spielFeld[2][i] === "kreis"){
+                    text.setText("Kreis hat gewonnen!")
+                    isWining = true;
+                }
+                if(spielFeld[0][i] === "kreuz" && spielFeld[1][i] === "kreuz" && spielFeld[2][i] === "kreuz"){
+                    text.setText("Kreuz hat gewonnen!")
+                    isWining = true;
+                }
+        }
+    } 
+
+        // Check Cross
+        if(isWining === false){
+            if(spielFeld[0][0] === "kreis" && spielFeld[1][1] === "kreis" && spielFeld[2][2] === "kreis"){
+                text.setText("Kreis hat gewonnen!")
+                    isWining = true;
+            }
+            if(spielFeld[0][0] === "kreuz" && spielFeld[1][1] === "kreuz" && spielFeld[2][2] === "kreuz"){
+                text.setText("Kreuz hat gewonnen!")
+                    isWining = true;
+                }
+            if(spielFeld[2][0] === "kreis" && spielFeld[1][1] === "kreis" && spielFeld[0][2] === "kreis"){
+                text.setText("Kreis hat gewonnen!")
+                    isWining = true;
+            }
+            if(spielFeld[2][0] === "kreuz" && spielFeld[1][1] === "kreuz" && spielFeld[0][2] === "kreuz"){
+                text.setText("Kreuz hat gewonnen!")
+                    isWining = true;
+                }
+        }
+        
+    }
+
+        function checkKachelPosition(x, y){
+            if(y < 200 && x < 200){
+                spielFeld[0][0] = amSpielzug;
+            }
+            if(y < 200 && x < 400 && x > 200){
+                spielFeld[0][1] = amSpielzug;
+            }
+            if(y < 200 && x < 650 && x > 400){
+                spielFeld[0][2] = amSpielzug;
+            }
+            if(y < 300 && y > 200 && x < 200){
+                spielFeld[1][0] = amSpielzug;
+            }
+            if(y < 300 && y > 200 && x < 400 && x > 200){
+                spielFeld[1][1] = amSpielzug;
+            }
+            if(y < 300 && y > 200 && x < 650 && x > 400){
+                spielFeld[1][2] = amSpielzug;
+            }
+            if(y < 500 && y > 300 && x < 200){
+                spielFeld[2][0] = amSpielzug;
+            }
+            if(y < 500 && y > 300 && x < 400 && x > 200){
+                spielFeld[2][1] = amSpielzug;
+            }
+            if(y < 500 && y > 300 && x < 650 && x > 400){
+                spielFeld[2][2] = amSpielzug;
+            }
+            else return;
+
+        }
+
+        function naechsterSpielzug() {
+            gewinnerPruefen();
+            if(isWining === true){
+                return;
+            } 
+            if (spielzug == 0){
+                text.setText(`Spiel beendet : Unentschieden`);
+                return;
+            }
+            if(amSpielzug == SPIELER1){
+                amSpielzug = SPIELER2;
+                return;
+              
+             } else if (amSpielzug == SPIELER2){
+                amSpielzug = SPIELER1;
+                return;
+            }
+        }
+
+
+    </script>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.53.1/dist/phaser.min.js"></script>
+</body>
+
+</html>
